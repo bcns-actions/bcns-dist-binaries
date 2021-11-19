@@ -3,7 +3,7 @@ inputs:
     description: 'Paths representing files to upload (comma delimited).'
     required: true
   s3_alias:
-    description: 'The S3 bucket access path (e.g. https://my-bucket.tld/).'
+    description: 'The S3 bucket access path (e.g. https://my-bucket.tld).'
     required: true
   s3_endpoint:
     description: 'The S3 endpoint url (e.g. s3.us-east-1.amazonaws.com).'
