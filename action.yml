@@ -6,7 +6,7 @@ inputs:
     description: 'The S3 bucket access path (e.g. https://my-bucket.tld).'
     required: true
   s3_endpoint:
-    description: 'The S3 endpoint url (e.g. s3.us-east-1.amazonaws.com).'
+    description: 'The S3 endpoint url (e.g. https://s3.us-east-1.amazonaws.com).'
     required: true
   s3_bucket:
     description: 'The S3 bucket name.'
@@ -30,8 +30,7 @@ runs:
         while IFS= read -rd, file; do
           s3_path="${S3_PATH_PREFIX}/${GITHUB_REF_SLUG}/$(basename "$file")"
           echo "- \`${S3_ALIAS}/${s3_path}\` $(stat -c%s "$file" | numfmt --to=iec)" >>.github/release-body.md
-          aws s3 cp \
-            --endpoint-url "${S3_ENDPOINT}" \
+          aws --endpoint-url "${S3_ENDPOINT}" s3 cp \
             --metadata "build-number=${GITHUB_RUN_NUMBER},commit=${GITHUB_SHA},date=${metadata_date}" \
             -- "$file" "s3://${S3_BUCKET}/${s3_path}"
         done <<<"${FILES},"
