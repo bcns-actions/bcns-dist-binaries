@@ -29,9 +29,10 @@ runs:
         metadata_date="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
         while IFS= read -rd, file; do
           s3_path="${S3_PATH_PREFIX}/${GITHUB_REF_SLUG}/$(basename "$file")"
+          metadata_sha256="$(shasum -a 256 -b -- "$file" | awk '{print $1}')"
           echo "- \`${S3_ALIAS}/${s3_path}\` $(stat -c%s "$file" | numfmt --to=iec)" >>.github/release-body.md
           aws --endpoint-url "${S3_ENDPOINT}" s3 cp \
-            --metadata "build-number=${GITHUB_RUN_NUMBER},commit=${GITHUB_SHA},date=${metadata_date}" \
+            --metadata "build-number=${GITHUB_RUN_NUMBER},commit=${GITHUB_SHA},date=${metadata_date},sha256=${metadata_sha256}" \
             -- "$file" "s3://${S3_BUCKET}/${s3_path}"
         done <<<"${FILES},"
       shell: bash
