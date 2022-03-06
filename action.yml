@@ -24,6 +24,7 @@ runs:
     - uses: bcns-actions/github-slug-action@v3.x
     - run: |
         echo "GITHUB_RELEASE_TAG=build-${GITHUB_REF_SLUG}" >>"$GITHUB_ENV"
+        if [[ ! -d .github ]]; then mkdir .github; fi
         echo "Build: [#${GITHUB_RUN_NUMBER}](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID})" >>.github/release-body.md
         echo "Commit: ${GITHUB_SHA}" >>.github/release-body.md
         metadata_date="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
