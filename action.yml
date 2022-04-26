@@ -21,15 +21,15 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - uses: bcns-actions/github-slug-action@v4.x
+    - uses: bcns-actions/bcns-slug@v1
     - run: |
-        echo "GITHUB_RELEASE_TAG=build-${GITHUB_REF_SLUG}" >>"$GITHUB_ENV"
+        echo "GITHUB_RELEASE_TAG=build-${GITHUB_BUILD_TAG}" >>"$GITHUB_ENV"
         if [[ ! -d .github ]]; then mkdir .github; fi
         echo "Build: [#${GITHUB_RUN_NUMBER}](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID})" >>.github/release-body.md
         echo "Commit: ${GITHUB_SHA}" >>.github/release-body.md
         metadata_date="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
         while IFS= read -rd, file; do
-          s3_path="${S3_PATH_PREFIX}/${GITHUB_REF_SLUG}/$(basename "$file")"
+          s3_path="${S3_PATH_PREFIX}/${GITHUB_BUILD_TAG}/$(basename "$file")"
           metadata_sha256="$(shasum -a 256 -b -- "$file" | awk '{print $1}')"
           echo "- $(basename "$file") - $(stat -c%s "$file" | numfmt --to=iec)" >>.github/release-body.md
           echo "  \`\`\`" >>.github/release-body.md
@@ -52,7 +52,7 @@ runs:
     - uses: bcns-actions/release-action@v1
       with:
         tag: ${{ env.GITHUB_RELEASE_TAG }}
-        prerelease: ${{ env.GITHUB_REF_SLUG != 'main' }}
+        prerelease: ${{ env.GITHUB_BUILD_TAG != 'main' }}
         name: |
           ${{ env.GITHUB_RELEASE_TAG }} #${{ github.run_number }}
         bodyFile: .github/release-body.md
